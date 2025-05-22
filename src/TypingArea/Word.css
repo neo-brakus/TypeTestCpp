@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Cascadia';
-    src: url('public/Fonts/CascadiaCode.woff2') format('woff2');
+    src: url('/Fonts/CascadiaCode.woff2') format('woff2');
     font-weight: normal;
     font-display: swap;
 }
