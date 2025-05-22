@@ -1,0 +1,21 @@
+@font-face {
+    font-family: 'Cascadia';
+    src: url('public/Fonts/CascadiaCode.woff2') format('woff2');
+    font-weight: normal;
+    font-display: swap;
+}
+
+div.word {
+    display: inline-block;
+    font-size: 44px;
+    font-family: Cascadia, monospace;
+    width: fit-content;
+    height: fit-content;
+    margin: 4px 13px 0 13px;
+    padding: 4px 0;
+    border-bottom: #282828 4px solid;
+}
+
+div.word.incorrect {
+    border-bottom: #0045b5 4px solid;
+}

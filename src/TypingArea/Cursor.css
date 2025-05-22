@@ -1,0 +1,25 @@
+@keyframes pulseAlpha {
+    0%   { opacity: 1; }
+    50%  { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+
+div.cursor {
+    position: absolute;
+    display: inline-block;
+    width: 26px;
+    height: 56px;
+    border-radius: 3px;
+    z-index: -1;
+    transition: 0.1s ease-in-out;
+    background-color: #1755c3;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    animation: none;
+    transform: translateX(0) translateY(-2px);
+}
+
+.cursor.pulsing {
+    animation: pulseAlpha 1s ease-in-out infinite;
+}

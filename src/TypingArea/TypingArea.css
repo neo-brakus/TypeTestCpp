@@ -1,0 +1,41 @@
+.typing-area {
+    width: 75%;
+    max-width: 1440px;
+    height: calc(67.75 * 3px);
+    position: relative;
+    border: solid 1px #d2d2d2;
+    overflow: hidden;
+}
+
+div.generated-code {
+    position: relative;
+    padding-bottom: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    overflow-y: auto;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+}
+
+.generated-code::-webkit-scrollbar {
+    display: none;
+}
+
+input.text-input {
+    margin: 0;
+    width: 100%;
+    height: 120%;
+    border: none;
+    outline: none;
+    z-index: 2;
+    opacity: 0;
+    position: absolute;
+    top: -10%;
+}
+
+div.generated-code-render-box {
+    height: calc(67.75 * 5px);
+}
