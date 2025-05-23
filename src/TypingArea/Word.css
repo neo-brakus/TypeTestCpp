@@ -6,14 +6,14 @@
 }
 
 div.word {
-    display: inline-block;
-    font-size: 44px;
+    font-size: 42px;
     font-family: Cascadia, monospace;
     width: fit-content;
     height: fit-content;
     margin: 4px 13px 0 13px;
     padding: 4px 0;
-    border-bottom: #282828 4px solid;
+    z-index: 1;
+    border-bottom: 4px solid rgba(40, 40, 40, 0);
 }
 
 div.word.incorrect {

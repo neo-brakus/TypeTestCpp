@@ -8,7 +8,9 @@ const Word = React.forwardRef(({ targetWord, typedWord, status, children}, ref) 
   const typedLetters = typedWord.split("");
 
   return (
-    <div ref={ref} className={`word ${status === "typed" && targetWord !== typedWord? "incorrect": ""} ${status}`.trim()}>
+    <div ref={ref}
+         className={`word ${status === "typed" && targetWord !== typedWord? "incorrect": ""} ${status}`.trim()}
+    >
       {children}
       {
         typedLetters.length > targetLetters.length &&

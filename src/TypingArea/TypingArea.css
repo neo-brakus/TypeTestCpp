@@ -1,23 +1,44 @@
-.typing-area {
+div.typing-container{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+div.loading {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    font-family: monospace;
+    color: #d2d2d2;
+    font-size: 3em;
+}
+
+div.typing-area {
     width: 75%;
-    max-width: 1440px;
-    height: calc(67.75 * 3px);
+    max-width: 1920px;
+    height: 210px;
     position: relative;
-    border: solid 1px #d2d2d2;
     overflow: hidden;
+    transition: opacity 0.5s ease-in-out;
 }
 
 div.generated-code {
     position: relative;
-    padding-bottom: 4px;
     display: flex;
     flex-wrap: wrap;
     width: 100%;
-    height: 100%;
+    height: 204px;
+    margin-bottom: 4px;
+    padding-bottom: 4px;
     justify-content: center;
     overflow-y: auto;
     scrollbar-width: none;
     scroll-behavior: smooth;
+    z-index: 1;
 }
 
 .generated-code::-webkit-scrollbar {
@@ -27,15 +48,36 @@ div.generated-code {
 input.text-input {
     margin: 0;
     width: 100%;
-    height: 120%;
+    height: 100%;
     border: none;
     outline: none;
-    z-index: 2;
+    z-index: 3;
     opacity: 0;
     position: absolute;
-    top: -10%;
 }
 
-div.generated-code-render-box {
-    height: calc(67.75 * 5px);
+
+div.timer {
+    font-family: monospace;
+    font-size: 40px;
+    font-weight: bold;
+    color: #227aff;
+    opacity: 0;
+    margin-bottom: 5px;
+}
+
+div.repeat {
+    margin-top: 20px;
+    cursor: pointer;
+}
+
+div.repeat img {
+    width: 32px;
+    height: 32px;
+    filter: brightness(0) invert(0.39);
+    transition: filter 0.25s ease-in-out;
+}
+
+div.repeat img:hover {
+    filter: brightness(0) invert(0.9);
 }
