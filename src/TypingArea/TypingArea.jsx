@@ -14,28 +14,111 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
   const inputRef = useRef(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
+  const [gameEnded, setGameEnded] = useState(false);
+  const [results] = useState({});
+
+  const typingContainerRef = useRef(null);
 
   let inputList = input.split(" ");
 
-  const reloadWords = () => {
-    setWords(randomCode((type.split(" ")[0] === "words"? type.split(" ")[1]: type.split(" ")[1]/15 * 50), syntax, expressions, semicolons));
+  const transitionSetOpacity = () => {
+    typingContainerRef.current.style.opacity = 1;
   }
 
+  //make a 0.5 second transition that makes the opacity 0 then 1
+  // //used universally to make changes inside the typing container
+  const transitionAnimation = () => {
+    typingContainerRef.current.style.opacity = 0;
+    setTimeout(transitionSetOpacity, 250)
+  }
+  
+  const handleGameEnded = () => {
+    setGameEnded(true);
+
+    const inputList = input.split(" ");
+    let time = timeLeft > 0 ? timeLeft : 1;
+    let words_typed = inputList.length;
+    let words_correct = 0;
+    let words_incorrect = 0;
+    let letters_typed = inputList.join("").length;
+    let letters_correct = 0;
+    let letters_incorrect = 0;
+    let letters_extra = 0;
+    let letters_missed = 0;
+
+    inputList.forEach((input_word, index) => {
+      if(words[index] !== undefined) {
+        words[index] === input_word? words_correct++ : words_incorrect++;
+        words[index].length < input_word.length?
+          (letters_extra += input_word.length - words[index].length):
+          (letters_missed += words[index].length - input_word.length);
+        input_word.split("").forEach((letter, letter_index) => {
+          letter_index < words[index].length && (letter === words[index].split("")[letter_index]? letters_correct++ : letters_incorrect++);
+        })
+      }
+    })
+
+    results.wpm = Math.round(words_correct * 60 / time);
+    results.raw = Math.round(words_typed * 60 / time);
+    results.time = time;
+    results.acc = Math.round(words_correct * 100 / words_typed); //percentage sign
+    results.char_acc = Math.round(letters_correct * 100 / letters_typed); //percentage
+    results.chars = [letters_correct, letters_incorrect, letters_extra, letters_missed];
+    results.type = [type.split(" ").join("-"), syntax === 1? "easy": syntax === 2? "normal": "hard"];
+  }
+  
   useEffect(() => {
-    reloadWords();
+    if(type.split(" ")[0] === "words" && inputList.length > type.split(" ")[1] ||
+      type.split(" ")[0] === "time" && inputList.length > type.split(" ")[1] * 100/15 ||
+      inputList.length.toString() === type.split(" ")[1] && inputList.at(-1) === words.at(-1)) {
+      results.gameEndType = "word-limit-reached";
+      transitionAnimation()
+      setTimeout(handleGameEnded, 250);
+    }
+  }, [input]);
+
+  //randomly regenerates the words 
+  const rerenderWords = () => {
+    setWords(randomCode((type.split(" ")[0] === "words"? type.split(" ")[1]: type.split(" ")[1] * 100/15), syntax, expressions, semicolons));
+  }
+
+  //delay the end of a game for the animation to finish
+  const endGameDelay = () => {
+    setGameEnded(false);
+  }
+
+  const resetGame = () => {
+    rerenderWords();
+    setGameStarted(false);
+    gameStartedFunct(false);
+    setInput("");
+    setTimeLeft(0);
+    transitionAnimation();
+    setTimeout(endGameDelay, 250);
+  }
+
+  //rerenders the words when any of the modes changes
+  useEffect(() => {
+    rerenderWords();
   }, [syntax, type, semicolons, expressions]);
 
 
   useEffect(() => {
     let interval;
 
-    if (gameStarted) {
-      interval = setInterval(() => {
-        setTimeLeft((prev) => prev + 1);
-      }, 1000);
+    if (gameStarted && !gameEnded) {
+      if(type.split(" ")[0] === "words" || type.split(" ")[0] === "time" && type.split(" ")[1] > timeLeft) {
+        interval = setInterval(() => {
+          setTimeLeft((prev) => prev + 1);
+        }, 1000);
+      }
+      if(type.split(" ")[0] === "time" && type.split(" ")[1] <= timeLeft) {
+        results.gameEndType = "time-ran-out";
+        transitionAnimation();
+        setTimeout(handleGameEnded, 250);
+      }
     }
 
-    // Cleanup
     return () => clearInterval(interval);
   }, [gameStarted, timeLeft]);
 
@@ -50,33 +133,88 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
   }, []);
 
   return (
-    <div className="typing-container">
+    <div className="typing-container" ref={typingContainerRef}>
       <div
         className="timer"
-        style={gameStarted ? { opacity: 1 } : { opacity: 0 }}>
+        style={gameStarted && !gameEnded && type.split(" ")[0] === "time"? { opacity: 1 } : { opacity: 0 }}>
         {timeLeft}
       </div>
+      {gameEnded &&
+        <div className="result-container-grid">
+
+          <div className="result-left important">
+            <div className="result-data">
+              wpm<span className="important">{results.wpm}</span>
+            </div>
+            <div className="result-data">
+              raw<span className="important">{results.raw}</span>
+            </div>
+           </div>
+
+          <div className="result-right important">
+            <div className="result-data">
+              time<span className="important">{results.time}s</span>
+            </div>
+            <div className="result-data">
+              acc<span className="important">{results.acc}%</span>
+            </div>
+          </div>
+
+          <div className="result-left middle">
+            <div className="result-data">
+              char-acc<span>{results.char_acc}%</span>
+            </div>
+          </div>
+
+          <div className="result-right middle">
+            <div className="result-data">
+              chars<span>{results.chars.join('/')}</span>
+            </div>
+          </div>
+
+          <div className="result-left">
+            <div className="result-data bottom">
+              test-type
+            </div>
+          </div>
+
+          <div className="result-right">
+            <div className="result-data">
+              <span>{results.type.join('-')}</span>
+            </div>
+          </div>
+
+          <div className="result-left">
+            <div className="result-data bottom">
+              game-end-type
+            </div>
+          </div>
+
+          <div className="result-right">
+            <div className="result-data">
+              <span>{results.gameEndType}</span>
+            </div>
+          </div>
+        </div>
+      }
+      {
+        !gameEnded &&
     <div className="typing-area">
       <input id="text-input" className="text-input" autoComplete="off" autoCapitalize="off" autoCorrect="off" ref={inputRef} value={input}
              onFocus={() => setFocused(true)}
              onBlur={() => setFocused(false)}
              onContextMenu={(event) => {event.preventDefault();}}
+             onKeyDown={(event) => {
+               if (event.key === "Enter") {
+                 results.gameEndType = "enter-key-pressed";
+                 transitionAnimation();
+                 setTimeout(handleGameEnded, 250);
+               }
+             }}
 
              onChange={(event) => {
 
                let newInput = event.target.value;
-
-
-               if (!gameStarted && newInput !== "") {
-                 setGameStarted(true);
-                 gameStartedFunct(true);
-               }
-
-               if (gameStarted && newInput === "") {
-                 setGameStarted(false);
-                 gameStartedFunct(false);
-                 setTimeLeft(0);
-               }
 
 
                //don't update if change is more than 1 letter
@@ -84,11 +222,13 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
 
                let newInputList = newInput.split(" ");
 
+
                //don't update if change happened but last word is the same
                if(newInputList.at(-1) === inputList.at(-1)) return;
 
                let backspace = (input.length > newInput.length);
                let space = newInputList.length > inputList.length;
+
 
                //if the number of extra letter is 10 then only accept backspace and space
                if(inputList[inputList.length - 1].length - 10 >= words[inputList.length - 1].length) {
@@ -105,6 +245,18 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
                  return;
                }
 
+               //setting the gameStarted variable
+               if (!gameStarted && newInput !== "") {
+                 setGameStarted(true);
+                 gameStartedFunct(true);
+               }
+
+               if (gameStarted && newInput === "") {
+                 setGameStarted(false);
+                 gameStartedFunct(false);
+                 setTimeLeft(0);
+               }
+
                //don't allow going back to correct words or going to next one with no letters typed
                if(inputList.at(-1).length === 0 && inputList.length > 1 && inputList[inputList.length - 2] === words[inputList.length - 2]) {
                  if(!backspace) {
@@ -114,32 +266,37 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
                  return;
                }
 
+
                space && setActiveWordIndex(activeWordIndex + 1);
-               (inputList.at(-1).length === 0 && inputList.length > 1 && backspace) && setActiveWordIndex(activeWordIndex - 1);
+               inputList.at(-1).length === 0 && inputList.length > 1 && backspace && setActiveWordIndex(activeWordIndex - 1);
 
                setWordChanged(newInputList.length !== inputList.length);
                setInput(newInput);
              }}
       />
       <div className="generated-code">
+        {words !== null &&  (words.map((word, i) => {
+          return i < activeWordIndex + 35 &&
+            <Word
+              key={i} targetWord={word}
+              typedWord={i < inputList.length? inputList[i]: ""}
+              ref={(i === inputList.length - 1)? scrollToRef: null}
 
-        {words !== null && words.map((word, i) => {
-          return <Word key={i} targetWord={word}
-                       typedWord={i < inputList.length? inputList[i]: ""}
-                       ref={(i === inputList.length - 1)? scrollToRef: null}
+              status={(i < inputList.length - 1? "typed":
+                (i === inputList.length - 1? "active": ""))}>
 
-                       status={(i < inputList.length - 1? "typed":
-                         (i === inputList.length - 1? "active": ""))}>
-            {i === inputList.length - 1 && <Cursor typedWord={i < inputList.length? inputList[i]: ""}
-                                                   focused={focused} targetWord={word} key={word}
-                                                   wordChanged={wordChanged}
-                                                   prevWordOffset={i > 0 && (words[i - 1].length - inputList[i - 1].length)}/>}
-          </Word>;
-        })}
+              {i === inputList.length - 1 && <Cursor typedWord={i < inputList.length? inputList[i]: ""}
+                                                     focused={focused} targetWord={word} key={word}
+                                                     wordChanged={wordChanged}
+                                                     prevWordOffset={i > 0 && (words[i - 1].length - inputList[i - 1].length)}/>}
+            </Word>;
+        }))
+        }
       </div>
     </div>
+      }
       <div className={"repeat"} onClick={() => {
-        reloadWords();
+          resetGame();
       }}>
         <img src={"./Images/replay.png"} alt="replay" />
       </div>

@@ -27,7 +27,7 @@ function App() {
       <div className="options-container" style={gameStarted? {transform: "translateY(-238px)"}: {transform: "translateY(0)"}}>
         <div className="options">
 
-          <div className="options-section">
+          <div className="options-section first">
             <div className="option-picker">
               <img className="syntax" src={"./Images/syntax.svg"} alt={"syntax"}></img>
               <div className={`option-pick ${syntax === 1? "active-option": ""}`.trim()} onClick={() => {
@@ -45,7 +45,7 @@ function App() {
             </div>
           </div>
           <div className="separator"></div>
-          <div className="options-section">
+          <div className="options-section second">
             <div className="option-picker">
               <img className="time" src={"./Images/time.svg"} alt={"time"}></img>
               <div className={`option-pick ${type === "time 15"? "active-option": ""}`.trim()} onClick={() => {
@@ -80,7 +80,7 @@ function App() {
             </div>
           </div>
           <div className="separator"></div>
-          <div className="options-section">
+          <div className="options-section third">
             <div className="option-picker">
               <img className="optional" src={"./Images/optional.svg"} alt={"optional"}></img>
               <div className={`option-pick ${semicolons? "active-option": ""}`.trim()} onClick={() => {
@@ -97,6 +97,13 @@ function App() {
       </div>
       <div className={"typing-area-container"}>
         <TypingArea syntax={syntax} type={type} semicolons={semicolons} expressions={expressions} gameStartedFunct={gameStartedFunct}/>
+      </div>
+      <div className="tips-container">
+        <div className="tips-area">
+          <div className="tip">
+            press <span>enter</span> to end a game
+          </div>
+        </div>
       </div>
     </div>
   )
