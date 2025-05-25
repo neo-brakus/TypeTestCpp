@@ -1,6 +1,17 @@
-# TypeTest++
+## 🚀 TypeTest++ - C++ Typing Practice
 
--->  https://neo-brakus.github.io/TypeTestCpp/  <--  
-The project is made using React.  
-This is a typing test with randomly generated c++ syntax.  
-If you select the expressions options you will get random expressions made up of commonly used variable names.  
+➡️ **Live Demo:** [neo-brakus.github.io/TypeTestCpp](https://neo-brakus.github.io/TypeTestCpp/)
+
+🛠️ This project is built using **React**.  
+⌨️ It's a typing test that generates random **C++ syntax** for you to practice typing speed and accuracy.  
+
+🧠 If you enable the **"Expressions"** option, you'll get randomized expressions using commonly seen variable names like `i`, `j`, `x`, `sum`, etc.
+
+🧪 Great for practicing:
+- C++ keywords
+- Code structure
+- Typing speed under pressure
+
+---
+
+✨ Give it a try and see how fast you can type real-looking C++ code!
