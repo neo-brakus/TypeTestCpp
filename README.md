@@ -5,7 +5,7 @@
 🛠️ This project is built using **React**.  
 ⌨️ It's a typing test that generates random **C++ syntax** for you to practice typing speed and accuracy.  
 
-🧠 If you enable the **"Expressions"** option, you'll get randomized expressions using commonly seen variable names like `i`, `j`, `x`, `sum`, etc.
+🧠 If you enable the **"Expressions"** option, you'll get randomized expressions using commonly seen variable names.
 
 🧪 Great for practicing:
 - C++ keywords
