@@ -18,8 +18,15 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
   const [results] = useState({});
 
   const typingContainerRef = useRef(null);
+  const generatedCodeRef = useRef(null);
+  const focusRef = useRef(null);
 
   let inputList = input.split(" ");
+
+  useEffect(() => {
+    generatedCodeRef.current.style.filter = focused? "blur(0px)": "blur(5px)";
+    focusRef.current.style.opacity = focused? "0" : "1";
+  }, [focused]);
 
   const transitionSetOpacity = () => {
     typingContainerRef.current.style.opacity = 1;
@@ -139,6 +146,11 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
         style={gameStarted && !gameEnded && type.split(" ")[0] === "time"? { opacity: 1 } : { opacity: 0 }}>
         {timeLeft}
       </div>
+      {
+        <div className={"focus"} ref={focusRef}>
+          <img className="cursor" src={"./Images/cursor.svg"} alt={"cursor"}></img><p>Click here to focus</p>
+      </div>
+      }
       {gameEnded &&
         <div className="result-container-grid">
 
@@ -274,7 +286,7 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
                setInput(newInput);
              }}
       />
-      <div className="generated-code">
+      <div className="generated-code" ref={generatedCodeRef}>
         {words !== null &&  (words.map((word, i) => {
           return i < activeWordIndex + 35 &&
             <Word
@@ -286,7 +298,7 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
                 (i === inputList.length - 1? "active": ""))}>
 
               {i === inputList.length - 1 && <Cursor typedWord={i < inputList.length? inputList[i]: ""}
-                                                     focused={focused} targetWord={word} key={word}
+                                                     focused={gameStarted} targetWord={word} key={word}
                                                      wordChanged={wordChanged}
                                                      prevWordOffset={i > 0 && (words[i - 1].length - inputList[i - 1].length)}/>}
             </Word>;
