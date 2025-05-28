@@ -246,6 +246,10 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
                  results.gameEndType = "enter-key-pressed";
                  transitionAnimation();
                  setTimeout(handleGameEnded, 250);
+                 return;
+               }
+               if(event.key === "Tab") {
+                 event.preventDefault();
                }
              }}
 
