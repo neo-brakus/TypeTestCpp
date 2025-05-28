@@ -103,6 +103,9 @@ function App() {
           <div className="tip">
             press <span>enter</span> to end a game
           </div>
+          <div className="tip">
+            press <span>tab</span> to regenerate words
+          </div>
         </div>
       </div>
     </div>

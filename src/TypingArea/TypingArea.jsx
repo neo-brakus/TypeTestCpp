@@ -8,7 +8,7 @@ import Cursor from "./Cursor.jsx";
 function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
   const [words, setWords] = useState(null);
   const [input, setInput] = useState("");
-  const [focused, setFocused] = useState(false);
+  const [focused, setFocused] = useState(true);
   const [wordChanged, setWordChanged] = useState(false);
   const [activeWordIndex, setActiveWordIndex] = useState(0);
   const inputRef = useRef(null);
@@ -24,8 +24,20 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
   let inputList = input.split(" ");
 
   useEffect(() => {
-    generatedCodeRef.current.style.filter = focused? "blur(0px)": "blur(5px)";
-    focusRef.current.style.opacity = focused? "0" : "1";
+    if (gameEnded && typingContainerRef.current) {
+      typingContainerRef.current.focus();
+      return;
+    }
+    if(!gameEnded && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [gameEnded]);
+
+  useEffect(() => {
+    if(!gameEnded) {
+      generatedCodeRef.current.style.filter = focused? "blur(0px)": "blur(5px)";
+      focusRef.current.style.opacity = focused? "0" : "1";
+    }
   }, [focused]);
 
   const transitionSetOpacity = () => {
@@ -41,6 +53,7 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
   
   const handleGameEnded = () => {
     setGameEnded(true);
+    setFocused(false);
 
     const inputList = input.split(" ");
     let time = timeLeft > 0 ? timeLeft : 1;
@@ -140,16 +153,28 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
   }, []);
 
   return (
-    <div className="typing-container" ref={typingContainerRef}>
+    <div className="typing-container" ref={typingContainerRef}
+         tabIndex={0}
+    onKeyDown={(event) =>{
+      if (event.key === "Enter" && gameEnded) {
+        event.preventDefault();
+        resetGame();
+      }
+      if(event.key === "Tab" && !gameStarted && !gameEnded) {
+        event.preventDefault();
+        resetGame();
+      }
+    }}>
       <div
         className="timer"
         style={gameStarted && !gameEnded && type.split(" ")[0] === "time"? { opacity: 1 } : { opacity: 0 }}>
         {timeLeft}
       </div>
       {
+        !gameEnded &&
         <div className={"focus"} ref={focusRef}>
           <img className="cursor" src={"./Images/cursor.svg"} alt={"cursor"}></img><p>Click here to focus</p>
-      </div>
+        </div>
       }
       {gameEnded &&
         <div className="result-container-grid">
