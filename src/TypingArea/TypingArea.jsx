@@ -21,6 +21,10 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
   const generatedCodeRef = useRef(null);
   const focusRef = useRef(null);
 
+  const[typedCorrect, setTypedCorrect] = useState(0);
+  const[typed, setTyped] = useState(0);
+  const[keysPressed, setKeysPressed] = useState(0);
+
   let inputList = input.split(" ");
 
   useEffect(() => {
@@ -57,10 +61,8 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
 
     const inputList = input.split(" ");
     let time = timeLeft > 0 ? timeLeft : 1;
-    let words_typed = inputList.length;
-    let words_correct = 0;
-    let words_incorrect = 0;
-    let letters_typed = inputList.join("").length;
+    let words_correct_norm = 0;
+    let words_norm = 0;
     let letters_correct = 0;
     let letters_incorrect = 0;
     let letters_extra = 0;
@@ -68,7 +70,12 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
 
     inputList.forEach((input_word, index) => {
       if(words[index] !== undefined) {
-        words[index] === input_word? words_correct++ : words_incorrect++;
+        if(words[index] === input_word) {
+          words_correct_norm += words[index].length + 1;
+          if(index === inputList.length - 1) words_correct_norm--;
+        }
+        words_norm += input_word.length + 1;
+        if(index === inputList.length - 1) words_norm--;
         words[index].length < input_word.length?
           (letters_extra += input_word.length - words[index].length):
           (letters_missed += words[index].length - input_word.length);
@@ -77,12 +84,13 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
         })
       }
     })
-
-    results.wpm = Math.round(words_correct * 60 / time);
-    results.raw = Math.round(words_typed * 60 / time);
+    words_correct_norm /= 5;
+    words_norm /= 5;
+    results.wpm = Math.round(words_correct_norm * 60 / time);
+    results.raw = Math.round(words_norm * 60 / time);
     results.time = time;
-    results.acc = Math.round(words_correct * 100 / words_typed); //percentage sign
-    results.char_acc = Math.round(letters_correct * 100 / letters_typed); //percentage
+    results.acc = typed === 0? 0: Math.round(100 * typedCorrect / typed);
+    results.eff = keysPressed === 0? 0: Math.round(100 * input.length / keysPressed);
     results.chars = [letters_correct, letters_incorrect, letters_extra, letters_missed];
     results.type = [type.split(" ").join("-"), syntax === 1? "easy": syntax === 2? "normal": "hard"];
   }
@@ -109,6 +117,9 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
 
   const resetGame = () => {
     rerenderWords();
+    setTypedCorrect(0);
+    setTyped(0);
+    setKeysPressed(0);
     setGameStarted(false);
     gameStartedFunct(false);
     setInput("");
@@ -199,7 +210,7 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
 
           <div className="result-left middle">
             <div className="result-data">
-              char-acc<span>{results.char_acc}%</span>
+              efficiency<span>{results.eff}%</span>
             </div>
           </div>
 
@@ -277,6 +288,7 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
                    setWordChanged(newInputList.length !== inputList.length);
                    space && setActiveWordIndex(activeWordIndex + 1);
                    setInput(newInput);
+                   setKeysPressed(keysPressed + 1);
                  }
                  return;
                }
@@ -301,6 +313,11 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
                //don't allow going back to correct words or going to next one with no letters typed
                if(inputList.at(-1).length === 0 && inputList.length > 1 && inputList[inputList.length - 2] === words[inputList.length - 2]) {
                  if(!backspace) {
+                   setKeysPressed(keysPressed + 1);
+                   setTyped(typed + 1);
+                   if(newInputList.at(-1).at(-1) === words[newInputList.length - 1].at(newInputList.at(-1).length - 1)) {
+                     setTypedCorrect(typedCorrect + 1);
+                   }
                    setWordChanged(newInputList.length !== inputList.length);
                    setInput(newInput);
                  }
@@ -308,6 +325,13 @@ function TypingArea({syntax, type, semicolons, expressions, gameStartedFunct}) {
                }
 
 
+               setKeysPressed(keysPressed + 1);
+               if(!(space || backspace)) {
+                 setTyped(typed + 1);
+                 if(newInputList.at(-1).at(-1) === words[newInputList.length - 1].at(newInputList.at(-1).length - 1)) {
+                   setTypedCorrect(typedCorrect + 1);
+                 }
+               }
                space && setActiveWordIndex(activeWordIndex + 1);
                inputList.at(-1).length === 0 && inputList.length > 1 && backspace && setActiveWordIndex(activeWordIndex - 1);
 
