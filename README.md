@@ -13,5 +13,3 @@
 - Typing speed under pressure
 
 ---
-
-✨ Give it a try and see how fast you can type real-looking C++ code!
