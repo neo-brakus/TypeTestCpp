@@ -1,4 +1,4 @@
-## TypeTest++ - C++ Typing Practice
+## TypeTest++
 
 **Live Demo:** [neo-brakus.github.io/TypeTestCpp](https://neo-brakus.github.io/TypeTestCpp/)
 
